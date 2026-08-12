@@ -1,0 +1,13 @@
+torch>=2.3
+transformers>=4.44
+accelerate
+nnsight>=0.4
+numpy
+pandas
+scikit-learn
+matplotlib
+pyyaml
+anthropic
+openai
+datasets            # GSM8K/MMLU samples for collateral checks
+tqdm

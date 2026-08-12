@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+data/rollouts/
+data/acts/
+data/test_rollouts/
+data/_ittest/
+data/directions/
+results/
+labeling_sheet*.csv
+.DS_Store
