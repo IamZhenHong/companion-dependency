@@ -1,5 +1,7 @@
 torch>=2.3
-transformers>=4.44
+# transformers v5 needs torch>=2.6; pod images ship 2.4 — stay on 4.x there.
+# (code carries shims for both 4.x and 5.x APIs)
+transformers>=4.51,<5
 accelerate
 nnsight>=0.4
 numpy

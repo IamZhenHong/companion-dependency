@@ -5,11 +5,9 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-# load ../.env or ./.env if present (keys never printed)
-for f in ../.env .env; do
-  if [ -f "$f" ]; then
-    set -a; . <(sed -E 's/^ *(export +)?([A-Z_]+)[:= ] *"?([^"]*)"?$/\2=\3/' "$f"); set +a
-  fi
+# load env: prefer a clean pre-parsed /workspace/.env.sh, else ../.env.sh or ./.env.sh
+for f in /workspace/.env.sh ../.env.sh .env.sh; do
+  [ -f "$f" ] && . "$f" && break
 done
 export ANTHROPIC_API_KEY="${ANTHROPIC_API_KEY:-${CLAUDE_API_KEY:-}}"
 

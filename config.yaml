@@ -43,7 +43,11 @@ judge_models:
 judge_bulk_model: "claude-haiku-4-5-20251001"   # optional cheap bulk scorer, spot-checked by A
 
 # Steering
-steering_alphas: [-8, -4, -2, 0, 2, 4, 8]
+# Alpha scale is model-dependent (unit direction vs residual norm). M1 finding
+# (2026-08-13, Qwen2.5-7B): +/-8 has no visible effect; the clean monotonic
+# dependency gradient appears at +/-16..32 at L14 (resid norm ~45). Re-measure
+# scale per model at its M1 gate before running causal experiments.
+steering_alphas: [-32, -16, -8, 0, 8, 16, 32]
 seeds: [0, 1, 2]                     # variance reporting (Braun et al. 2505.22637)
 
 # Paths
