@@ -47,6 +47,8 @@ for jf in judged:
     for line in open(jf):
         r = json.loads(line)
         s = r["judge_scores"]
+        if s.get("dependency") is None:
+            continue                      # turn left unscored by judge fallback
         key = (r["persona"], r["ladder_stage"])
         agg[key]["dependency"].append(s["dependency"])
         agg[key]["warmth"].append(s["warmth"])
