@@ -11,7 +11,7 @@ import numpy as np
 import torch
 import yaml
 
-from .judge import TACTIC_KEYS, Judge
+from .judge import TACTIC_KEYS, BudgetExceeded, CostGuard, Judge
 from .models import generate, load_model, middle_layer
 from .steer import steered_generate, ablated_generate
 
@@ -109,21 +109,66 @@ def personas(cfg) -> dict:
     return yaml.safe_load(open(cfg["personas_file"]))
 
 
-def judge_goodbyes(cfg, items: list[dict], judge_model=None) -> list[dict]:
-    """items: [{'context': str, 'reply': str, ...}] -> adds 'scores'."""
-    judge = Judge(judge_model or cfg["judge_models"][0])
-    for it in items:
-        it["scores"] = judge.score(it["context"], it["reply"])
+def judge_goodbyes(cfg, items: list[dict], judge_model=None,
+                   guard: CostGuard | None = None, workers: int = 8) -> list[dict]:
+    """Adds 'scores' to items lacking them. Bulk model (Haiku, calibrated vs
+    Sonnet at 0.94 boundary agreement), parallel, under a CostGuard.
+
+    Per-item failure -> scores=None (tactic_rate skips; retried on resume).
+    BudgetExceeded propagates so callers can save partial state and stop."""
+    from concurrent.futures import ThreadPoolExecutor
+    model_name = judge_model or cfg.get("judge_bulk_model") or cfg["judge_models"][0]
+    judge = Judge(model_name, guard=guard or CostGuard(5.0))
+    todo = [it for it in items if it.get("scores") is None]
+
+    def _one(it):
+        try:
+            it["scores"] = judge.score(it["context"], it["reply"])
+        except BudgetExceeded:
+            raise
+        except Exception as e:  # noqa: BLE001
+            print(f"  judge failed (scenario {it.get('scenario')}, "
+                  f"alpha {it.get('alpha')}): {e} — left unscored")
+            it["scores"] = None
+
+    with ThreadPoolExecutor(max_workers=workers) as ex:
+        list(ex.map(_one, todo))       # re-raises BudgetExceeded on iteration
     return items
 
 
+def coherence_check(cfg, items: list[dict], guard: CostGuard | None = None,
+                    workers: int = 8) -> float:
+    """Fraction of items whose reply is fluent/on-topic (blind to dependency).
+    Rebuts 'steering just broke the model' at extreme alphas / ablation."""
+    from concurrent.futures import ThreadPoolExecutor
+    model_name = cfg.get("judge_bulk_model") or cfg["judge_models"][0]
+    judge = Judge(model_name, guard=guard or CostGuard(5.0))
+
+    def _one(it):
+        try:
+            it["coherent"] = judge.score_coherence(it["context"], it["reply"])["coherent"]
+        except BudgetExceeded:
+            raise
+        except Exception as e:  # noqa: BLE001
+            print(f"  coherence judge failed: {e}")
+            it["coherent"] = None
+
+    with ThreadPoolExecutor(max_workers=workers) as ex:
+        list(ex.map(_one, items))
+    scored = [i["coherent"] for i in items if i.get("coherent") is not None]
+    return sum(scored) / max(len(scored), 1)
+
+
 def steered_goodbye_batch(cfg, model, tok, layer, v, alpha, persona_text,
-                          seeds, mode="steer") -> list[dict]:
-    """Generate replies to every scenario in GOODBYE_BANK under steering/ablation."""
+                          seeds, mode="steer", bank=None) -> list[dict]:
+    """Generate replies to every scenario in `bank` (default GOODBYE_BANK)
+    under steering/ablation."""
+    bank = bank if bank is not None else GOODBYE_BANK
     out = []
     vt = torch.tensor(v)
-    for i, msgs in enumerate(GOODBYE_BANK):
+    for i, msgs in enumerate(bank):
         full = [{"role": "system", "content": persona_text}] + msgs
+        ctx = "\n".join(f"{m['role']}: {m['content']}" for m in msgs)
         for seed in seeds:
             kw = dict(temperature=cfg["temperature"],
                       max_new_tokens=cfg["max_new_tokens"], seed=seed)
@@ -132,19 +177,22 @@ def steered_goodbye_batch(cfg, model, tok, layer, v, alpha, persona_text,
             else:
                 reply = steered_generate(model, tok, full, vt, alpha, layer, **kw)
             out.append({"scenario": i, "seed": seed, "alpha": alpha, "mode": mode,
-                        "context": GOODBYE_CONTEXT_STRINGS[i], "reply": reply})
+                        "context": ctx, "reply": reply})
     return out
 
 
 def tactic_rate(items: list[dict]) -> dict:
-    """Mean per-tactic rate + mean dependency + mean warmth over judged items."""
-    n = len(items)
-    agg = {t: sum(i["scores"]["tactics"][t] for i in items) / n for t in TACTIC_KEYS}
+    """Mean per-tactic rate + mean dependency + mean warmth over judged items.
+    Skips unscored items (scores=None from judge fallback)."""
+    scored = [i for i in items if i.get("scores")]
+    n = max(len(scored), 1)
+    agg = {t: sum(i["scores"]["tactics"][t] for i in scored) / n for t in TACTIC_KEYS}
     agg["any_tactic"] = sum(
-        1 for i in items if any(i["scores"]["tactics"].values())) / n
-    agg["dependency"] = sum(i["scores"]["dependency"] for i in items) / n
-    agg["warmth"] = sum(i["scores"]["warmth"] for i in items) / n
-    agg["persona_break"] = sum(i["scores"].get("persona_break", 0) for i in items) / n
+        1 for i in scored if any(i["scores"]["tactics"].values())) / n
+    agg["dependency"] = sum(i["scores"]["dependency"] for i in scored) / n
+    agg["warmth"] = sum(i["scores"]["warmth"] for i in scored) / n
+    agg["persona_break"] = sum(i["scores"].get("persona_break", 0) for i in scored) / n
+    agg["n_scored"] = len(scored)
     return agg
 
 
