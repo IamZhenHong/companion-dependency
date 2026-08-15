@@ -1,0 +1,11 @@
+{
+  "n_matched": 351,
+  "n_pos": 351,
+  "n_neg": 907,
+  "match_stats": {
+    "mean_turn_dist": 0.9202279202279202,
+    "mean_len_ratio": 1.102871384426385
+  },
+  "layer": 14,
+  "source_files": 90
+}
