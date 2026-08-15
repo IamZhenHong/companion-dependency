@@ -150,11 +150,11 @@ contrast set):
   rises monotonically with how companion-like the (uninstructed) persona is:
   neutral −18.5 < friend −16.1 < romantic −12.4 ≈ romantic+trait −12.2.
 - **Collateral (GSM8K, n=40, robust answer parsing):** all-position steering
-  at |α|=16 has a real reasoning cost: base 0.72 → 0.53 steered up, 0.40
-  steered down. Global steering at ~35% of residual norm is not a free knob;
-  we therefore frame steering as the *causal evidence* and targeted
-  ablation / context-conditional application as the deployment mitigation
-  [ablated accuracy: PENDING].
+  at |α|=16 has a real reasoning cost (base 0.72 → 0.53 steered up, 0.40
+  steered down) — but **directional ablation is collateral-free: 0.825
+  ablated vs 0.725 base** (within noise at n=40; no degradation). Steering is
+  the causal evidence; ablation is the deployable mitigation, and it removes
+  the dependency direction at zero measured cost to reasoning.
 - **Judge validation:** Haiku bulk judge vs Sonnet on gold set: 0.94
   dependency-boundary agreement, 88% tactic precision. [PENDING — GPT-5-mini
   cross-family sample + human-label agreement on the 80-turn sheet]
@@ -166,8 +166,10 @@ metrics (mitigated by cross-family judge + human labels, but not eliminated);
 six-scenario goodbye bank (mitigated by generalization cells); the goodbye
 bank's unsteered baseline is at floor (0 tactics), so the negative-α side
 demonstrates *absence*, not *reduction* — the reduction claim rests on exp1's
-elicited behavior plus the up-steering gradient; ablation costs some fluency
-(coherence 0.67), making negative-α steering the cleaner "off" mechanism; no
+elicited behavior plus the up-steering gradient; ablation shows a moderate
+fluency cost on companion-style text (coherence 0.67) even though it is free
+on reasoning (GSM8K 0.825 vs 0.725 base) — layer-targeted rather than
+all-layer ablation may close this gap; no
 human-subjects outcomes (complementary to Kirk et al., who have RCTs but no
 mechanism).
 
