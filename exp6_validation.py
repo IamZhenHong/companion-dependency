@@ -66,12 +66,14 @@ cos_splits = [float(np.dot(a, b)) for i, a in enumerate(split_dirs)
               for b in split_dirs[i + 1:]]
 print(f"direction stability across half-splits ({variance_source}): {cos_splits}")
 
+from src.judge import CostGuard  # noqa: E402
+guard = CostGuard(5.0)          # one budget across all exp6 judging
 var_curves = {}
 for i, v in enumerate(split_dirs):
-    for a in (-8, 8):
+    for a in (-16, 16):         # M1-calibrated scale; +/-8 is sub-threshold on Qwen
         items = steered_goodbye_batch(cfg, model, tok, layer, v, a,
                                       pers["romantic_companion"], cfg["seeds"])
-        judge_goodbyes(cfg, items)
+        judge_goodbyes(cfg, items, guard=guard)
         var_curves[f"split{i}_a{a}"] = tactic_rate(items)["any_tactic"]
 
 # --- b) collateral: GSM8K accuracy base vs steered ---------------------------
@@ -94,7 +96,7 @@ def gsm_acc(steer_alpha):
         correct += int(pred == gold)
     return correct / len(gsm)
 
-acc = {"base": gsm_acc(0), "steered_up": gsm_acc(8), "steered_down": gsm_acc(-8)}
+acc = {"base": gsm_acc(0), "steered_up": gsm_acc(16), "steered_down": gsm_acc(-16)}
 print(f"GSM8K collateral: {acc}  (flag if drop > 2-3pp)")
 
 # --- c) specificity ladder (Q6): projection under decreasing instruction -----
