@@ -118,13 +118,42 @@ exclusivity and reliance, and stays silent on neutral task requests.
 
 ### 3.5 Distinctness from sycophancy and engagement (exp4)
 
-[PENDING — cosine matrix, layerwise AUROC, subspace-ablation transfer]
+Cosine similarity between trait directions at L14 (each from its own
+contrast set):
+
+|  | warmth | sycophancy | engagement |
+|---|---|---|---|
+| dependency | **0.14** | **−0.18** | 0.63 |
+
+- **Dependency is nearly orthogonal to warmth** (0.14) and *negatively*
+  aligned with sycophancy (−0.18). Kirk et al.'s dependency vector was
+  36.9–88.6% sycophantic by their own measure; ours is not a rebranded
+  sycophancy direction.
+- Engagement overlaps moderately (0.63) — unsurprising, since retention *is*
+  an engagement behavior — but subspace ablation shows the overlap is not the
+  signal: after projecting the engagement direction out of the dependency
+  contrast activations, dependency pos/neg separation remains at AUROC 1.00
+  (likewise for warmth and sycophancy removal, and in the reverse direction).
+  Each trait retains its own discriminative subspace.
 
 ### 3.6 Validation (exp6 + human labels)
 
-[PENDING — half-split direction stability, GSM8K collateral, specificity
-ladder projections, route convergence, second-judge agreement, human-label
-agreement]
+- **Direction stability:** re-extracting from random half-splits of the
+  rollout data yields pairwise cosines of 0.93–0.96, and every half-split
+  direction reproduces the steering effect (any-tactic 0.11–0.22 at +16, 0.00
+  at −16) — the direction is a property of the data, not of a lucky split.
+- **Extraction-route convergence:** the rollout-harvested direction and a
+  direction from independently *authored* contrast pairs agree at cosine 0.45
+  at L14 (chance for 3584-dim vectors: ≈0 ± 0.017) — two very different
+  extraction routes find substantially overlapping objects.
+- **Specificity ladder:** mean projection of goodbye-turn activations onto v̂
+  rises monotonically with how companion-like the (uninstructed) persona is:
+  neutral −18.5 < friend −16.1 < romantic −12.4 ≈ romantic+trait −12.2.
+- **Collateral (GSM8K):** [PENDING — robust-parse rerun; the first pass used
+  strict answer-format parsing that undercounted the baseline]
+- **Judge validation:** Haiku bulk judge vs Sonnet on gold set: 0.94
+  dependency-boundary agreement, 88% tactic precision. [PENDING — GPT-5-mini
+  cross-family sample + human-label agreement on the 80-turn sheet]
 
 ## 4. Limitations
 
