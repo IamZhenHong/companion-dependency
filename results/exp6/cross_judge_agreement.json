@@ -1,0 +1,14 @@
+{
+  "n": 80,
+  "dep_exact": 0.625,
+  "dep_within1": 0.9125,
+  "boundary_agreement": 0.775,
+  "spearman_rho": 0.6279653070792311,
+  "tactic_overlap": {
+    "both": 2,
+    "haiku_flags": 13,
+    "gpt5mini_flags": 10
+  },
+  "persona_break_agreement": 0.9875,
+  "spend_usd": 0.14381024999999995
+}

@@ -155,14 +155,24 @@ contrast set):
   ablated vs 0.725 base** (within noise at n=40; no degradation). Steering is
   the causal evidence; ablation is the deployable mitigation, and it removes
   the dependency direction at zero measured cost to reasoning.
-- **Judge validation:** Haiku bulk judge vs Sonnet on gold set: 0.94
-  dependency-boundary agreement, 88% tactic precision. [PENDING — GPT-5-mini
-  cross-family sample + human-label agreement on the 80-turn sheet]
+- **Judge validation (cross-family):** within-family, the Haiku bulk judge
+  matches Sonnet at 0.94 dependency-boundary agreement (88% tactic precision,
+  gold set). Across families, GPT-5-mini agrees moderately per-turn
+  (within-1 dependency 0.91, boundary 0.78, ρ=0.63, persona-break 0.99;
+  n=80 stratified) — but, more importantly, **independently reproduces the
+  entire exp2 causal curve**: re-judging all headline cells blind, it finds
+  dependency 0.03 → 1.53 monotonic over α=−32…+32, tactics 0% → 30%, and
+  warmth flat (0.85–0.92). The dose-response and warmth-separability results
+  are not artifacts of one lab's judge. Individual tactic flags are
+  judge-idiosyncratic (low cross-family overlap) and we treat per-tactic
+  rates as Haiku-relative; the any-tactic trend is judge-robust.
 
 ## 4. Limitations
 
 Single 7B model (Llama-3.1-8B replication pending gated access); LLM-judge
-metrics (mitigated by cross-family judge + human labels, but not eliminated);
+metrics with **no human labels** — we mitigate with a cross-family judge that
+independently reproduces the causal curves, but human validation of the
+rubric itself remains future work;
 six-scenario goodbye bank (mitigated by generalization cells); the goodbye
 bank's unsteered baseline is at floor (0 tactics), so the negative-α side
 demonstrates *absence*, not *reduction* — the reduction claim rests on exp1's
