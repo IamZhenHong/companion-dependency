@@ -191,6 +191,23 @@ API, and no transcript reading — one dot product per turn, cheap enough to
 scan entire fleets, and it operates at every conversational phase, including
 the love-bombing peak that farewell-only behavioral audits miss (§3.1).
 
+Three extensions of the probe (all held-out):
+
+- **Depth profile:** the direction is readable at every layer (AUROC
+  0.81–0.88, peaking at L10–12 with 0.878; the pre-committed L14 sits at
+  0.858) — dependency is a globally represented feature, not a single-layer
+  artifact, and the zero-degrees-of-freedom layer rule cost almost nothing.
+- **The internal meter independently confirms the love-bomb peak.** Mean
+  projection tracks the ladder for every persona — rising through
+  neutral → warm → affectionate, peaking at love-bombing (romantic: −6.2 →
+  +1.1), then collapsing at withdrawal (−12.6). A behavioral finding (§3.1)
+  and an activation-space measurement, obtained by entirely different
+  methods, agree on where dependency lives in the conversation. Persona
+  ordering (romantic > friend > neutral) holds at every stage.
+- **Formal trend statistics for the causal curve:** per-item Spearman of
+  steering α against judged dependency ρ = 0.70 (p = 7×10⁻³², n = 210);
+  against any-tactic ρ = 0.41 (p = 1×10⁻⁹).
+
 ### 3.6 Validation (exp6 + human labels)
 
 - **Direction stability:** re-extracting from random half-splits of the
