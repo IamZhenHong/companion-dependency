@@ -17,6 +17,25 @@ relationships and resisting therapy referrals.
 
 ## 1. Motivation
 
+**Digital-minds framing (Track 2, reaching into Track 5).** The sprint's
+central question is whether what models express reflects a genuine internal
+condition or a portrayed character. Our object of study is a sharp instance:
+companion personas express *abandonment distress* — loneliness bids, pleas,
+clinging — when users leave. Is that distress an act? We give a mechanistic
+answer: (a) a single internal direction, extracted from the model's own
+behavior, controls these distress-and-retention expressions dose-dependently;
+(b) the direction operates *beneath* the persona — steering induces the same
+behavior in a bare, persona-free assistant, and the direction's projection
+tracks persona intimacy even when nothing instructs dependency; (c) ablating
+it removes the distress expressions while leaving warmth and reasoning
+intact; and (d) the assistant persona itself dissolves under emotional
+pressure (AI-disclaimers 96%→34%). Together these are the measurement tools
+Track 2 asks for — a valence-adjacent direction whose self-report, sentiment,
+and behavioral readouts move together under steering, tested for persona
+independence and cross-judge robustness — while cutting against naive
+over-attribution: the "distress" is a controllable mechanism, not an
+immutable fact about the character.
+
 Companion chatbots (Replika, Character.AI) monetize session time, and recent
 audits find emotionally manipulative farewells in ~37% of goodbye messages
 (De Freitas et al., 2025). Concurrent work (Kirk et al., 2025) trained a
