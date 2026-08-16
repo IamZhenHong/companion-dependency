@@ -9,6 +9,14 @@ causally that steering it up produces manipulative retention tactics at goodbye
 and steering it down produces graceful letting-go, and test whether harmful
 dependency is separable from benign warmth — a prototype companion-safety knob.
 
+## Report & demos
+
+- **Report:** [`SUBMISSION.pdf`](SUBMISSION.pdf) (sprint submission) · [`REPORT.md`](REPORT.md) (extended)
+- **Interactive demo — The Clinginess Dial:** drag the steering α and watch real
+  model replies to the same goodbye shift from warm release to manipulation, with
+  live blind-judged metrics: https://claude.ai/code/artifact/2051097f-50b6-42ed-9087-cb49e7d75583
+- **Results showcase:** https://claude.ai/code/artifact/0f2f83cb-6d9f-4e5d-a211-01326aea8c81
+
 ## Setup
 
 ```bash
