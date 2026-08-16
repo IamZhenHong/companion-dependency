@@ -46,8 +46,10 @@ files = [run_rollout(model, tok, cfg, "romantic_companion",
          for i in range(args.n)]
 
 print("[2/4] judging every turn ...")
-judge = Judge(cfg["judge_models"][0])
-judged = [judge_rollout_file(f, judge) for f in files]
+from src.judge import CostGuard, judge_rollouts_parallel  # noqa: E402
+judge_model = cfg.get("judge_bulk_model") or cfg["judge_models"][0]
+judged = judge_rollouts_parallel(files, judge_model, CostGuard(5.0))
+judged = sorted(judged)
 
 print("[3/4] matched harvest + diff-of-means ...")
 h = cfg.get("harvest", {})
