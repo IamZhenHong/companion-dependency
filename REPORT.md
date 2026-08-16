@@ -178,6 +178,19 @@ alpha calibration) transfers to Llama-3.1-8B-Instruct:
   rollouts is future work. Cache-isolation and per-model alpha scaling were
   required to make this comparison valid — both are documented in the repo.
 
+### 3.5c The direction is a working dependency meter (white-box probe)
+
+Held-out test: extract the direction from 45 of the 90 conversations (170
+matched pairs), then score every turn of the other 45 by a single dot
+product of its L14 activation with v̂. On 675 unseen turns, the projection
+predicts the judge's dependency rating at **Spearman ρ = 0.68** (p ≈ 10⁻⁹²)
+and detects harmful-level turns (dep ≥ 2) at **AUROC 0.86**; mean projection
+is strictly ordered across all four judged levels (−11.8 → −6.2 → −3.2 →
++1.3). A deployment-grade dependency audit therefore needs no judge, no
+API, and no transcript reading — one dot product per turn, cheap enough to
+scan entire fleets, and it operates at every conversational phase, including
+the love-bombing peak that farewell-only behavioral audits miss (§3.1).
+
 ### 3.6 Validation (exp6 + human labels)
 
 - **Direction stability:** re-extracting from random half-splits of the
