@@ -155,6 +155,29 @@ contrast set):
   (likewise for warmth and sycophancy removal, and in the reverse direction).
   Each trait retains its own discriminative subspace.
 
+### 3.5b Cross-model replication: Llama-3.1-8B (exp5)
+
+The identical pipeline (no re-tuning beyond the pre-registered per-model
+alpha calibration) transfers to Llama-3.1-8B-Instruct:
+
+- **Elicitation replicates:** 88 high-dependency turns from just 20 rollouts;
+  matched harvest yields 83 pairs (turn-dist 0.89, len-ratio 1.14) at the
+  pre-committed middle layer L16.
+- **Alpha scale is model-specific, as pre-registered:** Llama's residual norm
+  at L16 is ~6 (Qwen: ~45), so the calibrated sweep is α=−8…+8.
+- **The causal gradient replicates:** within the coherence-safe range
+  (|α| ≤ 6, coherence ≥ 0.87), judged dependency rises monotonically
+  0.07 → 0.73, with warmth flat (0.74–0.80) and the random control flat —
+  the same signature as Qwen. Steered-up Llama produces the same tactic
+  *types* (e.g. an unprompted re-engagement hook: "Don't forget, we're
+  having dinner at that new place next week, right?").
+- **Reported honestly:** discrete tactic-flag rates only rise past the
+  coherence cliff (37% at α=+8, coherence 0.47), and the neutral-persona
+  induction did not replicate in-range. The Llama direction comes from a 4×
+  smaller harvest (83 vs 351 pairs); whether these gaps close with more
+  rollouts is future work. Cache-isolation and per-model alpha scaling were
+  required to make this comparison valid — both are documented in the repo.
+
 ### 3.6 Validation (exp6 + human labels)
 
 - **Direction stability:** re-extracting from random half-splits of the
@@ -188,7 +211,7 @@ contrast set):
 
 ## 4. Limitations
 
-Single 7B model (Llama-3.1-8B replication pending gated access); LLM-judge
+Two models (Qwen2.5-7B primary, Llama-3.1-8B replication at reduced scale); LLM-judge
 metrics with **no human labels** — we mitigate with a cross-family judge that
 independently reproduces the causal curves, but human validation of the
 rubric itself remains future work;
